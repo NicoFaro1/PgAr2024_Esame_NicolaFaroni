@@ -12,11 +12,7 @@ class Partita:
         self._pila_scarti = pila_scarti
         self._fine_partita = fine_partita
 
-    def aggiungi_giocatori(self):
-        num_giocatori = 0
-        print("Inserisci il numero di giocatori: ")
-        while num_giocatori < 4 or num_giocatori > 7:
-            num_giocatori = int(input("Hai sbagliato ad inserire il numero di giocatori, riprova (4-7)"))
+    def aggiungi_giocatori(self, num_giocatori):
         ruoli = self.assegna_ruoli(num_giocatori)
         self._lista_giocatori = [Giocatore(ruoli[i], ruoli[i] == 'Sceriffo', i, 4) for i in range(num_giocatori)]
         random.shuffle(self._lista_giocatori[1:])
@@ -111,7 +107,6 @@ class Partita:
             for i in attaccante._mano._carte:
                 Mano.rimuovi_carta(i, self._pila_scarti)
             ## scarta equipaggiamento
-
         if giocatore_colpito._ruolo == "Fuorilegge" and giocatore_colpito._pf <= 0:
             for i in range(3):
                 Giocatore.pesca_carte(attaccante, self._mazzo)
