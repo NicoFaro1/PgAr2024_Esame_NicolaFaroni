@@ -4,7 +4,7 @@ from class_carta import Carta
 from class_arma import Arma
 
 class Giocatore:
-    def __init__(self, ruolo: str, sceriffo: bool, posizione: int, pf: int, id: int, equipaggiamento: Arma, abilità: str):
+    def __init__(self, ruolo: str, sceriffo: bool, posizione: int, pf: int, id: int, equipaggiamento: Arma, abilità: str, sbleuri: int):
         self._ruolo = ruolo
         self._sceriffo = sceriffo
         self._posizione = posizione
@@ -13,6 +13,7 @@ class Giocatore:
         self._equipaggiamento = equipaggiamento
         self._abilità = abilità
         self._mano = Mano()
+        self._sbleuri = sbleuri
 
     def pesca_carte(self, mazzo: Mazzo) -> list:
         carta_pescata = mazzo.pesca_carte()

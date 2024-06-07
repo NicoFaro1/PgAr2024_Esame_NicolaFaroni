@@ -4,13 +4,14 @@ from class_mano import Mano
 import random
 
 class Partita:
-    def __init__(self, num_giocatori: int, lista_giocatori: list, turno: int, pila_scarti: list, fine_partita: bool):
+    def __init__(self, num_giocatori: int, lista_giocatori: list, turno: int, pila_scarti: list, fine_partita: bool, tipo_partita: int):
         self._num_giocatori = num_giocatori
         self._lista_giocatori = lista_giocatori
         self._turno = turno
         self._mazzo = Mazzo.crea_mazzo()
         self._pila_scarti = pila_scarti
         self._fine_partita = fine_partita
+        self._tipo_partita = tipo_partita
 
     def aggiungi_giocatori(self, num_giocatori: int):
         ruoli = self.assegna_ruoli(num_giocatori)
@@ -66,6 +67,9 @@ class Partita:
 
     def verifica_condizioni_fine_partita(self, giocatore_eliminato: Giocatore):
         self._fine_partita = False
+        vittoria_legge = False
+        vittoria_rinnegato = False
+        vittoria_fuorilegge = False
         if giocatore_eliminato._ruolo == "Sceriffo":
             rinnegato_in_gioco = False
             altri_giocatori_vivi = False
@@ -77,9 +81,11 @@ class Partita:
             if altri_giocatori_vivi and not rinnegato_in_gioco:
                 print("I fuorilegge hanno vinto!")
                 self._fine_partita = True
+                vittoria_fuorilegge = True
             if not altri_giocatori_vivi and rinnegato_in_gioco:
                 print("Il rinnegato ha vinto!")
                 self._fine_partita = True
+                vittoria_rinnegato = True
         if giocatore_eliminato._ruolo == "Fuorilegge" or giocatore_eliminato._ruolo == "Rinnegato":
             rinnegato_vivo = False
             fuorilegge_vivi = False
@@ -93,6 +99,14 @@ class Partita:
                     if giocatori._ruolo == "Sceriffo" or giocatori._ruolo == "Vice":
                         print("Lo sceriffo e i suoi Vice hanno vinto!")
                         self._fine_partita = True
+                        vittoria_legge = True
+        if vittoria_legge:
+            self.calcolo_punti_legge()
+        if vittoria_fuorilegge:
+            self.calcolo_punti_fuorilegge()
+        if vittoria_rinnegato:
+            self.calcolo_punti_rinnegato()
+
 
     def elimina_giocatore(self, giocatore_colpito: Giocatore, attaccante: Giocatore):
         if giocatore_colpito._pf <= 0:
@@ -161,10 +175,95 @@ class Partita:
 
     def inizia_partita(self):
         while not self._fine_partita:
-            self._turno = 0
-            giocatore_corrente = self._lista_giocatori[self._turno % len(self._lista_giocatori)]    
-            self.turno_giocatore(giocatore_corrente)
-            self._turno += 1
+            print("In che modalità vuoi giocare?\n")
+            risposta = int(input("Premi 1 per la modalità classica e 2 per la modalità torneo\n"))
+            if risposta == 1:
+                self._turno = 0
+                giocatore_corrente = self._lista_giocatori[self._turno % len(self._lista_giocatori)]    
+                self.turno_giocatore(giocatore_corrente)
+                self._turno += 1
+            else:
+                self.modalità_torneo()
+
+    def modalità_torneo(self):
+        for giocatore in self._lista_giocatori:
+            giocatore._sbleuri = 500
+            giocatore._sbleuri -= 50
+        self._turno = 0
+        giocatore_corrente = self._lista_giocatori[self._turno % len(self._lista_giocatori)]    
+        self.turno_giocatore(giocatore_corrente)
+        self._turno += 1
+
+    def calcolo_punti_legge(self):
+        if self._num_giocatori == 4:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Sceriffo":
+                    i._sbleuri += 1400
+                if i._ruolo == "Rinnegato":
+                    i._sbleuri += 250
+        if self._num_giocatori == 5:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Sceriffo":
+                    i._sbleuri += 1200
+                if i._ruolo == "Vice":
+                    i._sbleuri += 1200
+                if i._ruolo == "Rinnegato":
+                    i._sbleuri += 300
+        if self._num_giocatori == 6:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Sceriffo":
+                    i._sbleuri += 1600
+                if i._ruolo == "Vice":
+                    i._sbleuri += 1600
+                if i._ruolo == "Rinnegato":
+                    i._sbleuri += 350
+        if self._num_giocatori == 7:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Sceriffo":
+                    i._sbleuri += 1200
+                if i._ruolo == "Vice":
+                    i._sbleuri += 1200
+                if i._ruolo == "Rinnegato":
+                    i._sbleuri += 400
+        print("Sbleuri assegnati")
+
+    def calcolo_punti_fuorilegge(self):
+        if self._num_giocatori == 4:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Fuorilegge":
+                    i._sbleuri += 2200
+        if self._num_giocatori == 5:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Fuorilegge":
+                    i._sbleuri += 2400
+        if self._num_giocatori == 6:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Fuorilegge":
+                    i._sbleuri += 2600
+        if self._num_giocatori == 7:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Fuorilegge":
+                    i._sbleuri += 2800
+        print("Sbleuri assegnati")
+
+    def calcolo_punti_rinnegato(self):
+        if self._num_giocatori == 4:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Rinnegato":
+                    i._sbleuri += 2200
+        if self._num_giocatori == 5:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Rinnegato":
+                    i._sbleuri += 2400
+        if self._num_giocatori == 6:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Rinnegato":
+                    i._sbleuri += 2600
+        if self._num_giocatori == 7:
+            for i in self._lista_giocatori:
+                if i._ruolo == "Rinnegato":
+                    i._sbleuri += 2800
+        print("Sbleuri assegnati")
 
     def verifica_num_giocatori(self) -> int:
         num_giocatori = 0
