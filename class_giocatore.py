@@ -1,9 +1,10 @@
 from class_mazzo import Mazzo
 from class_mano import Mano
 from class_carta import Carta
+from class_arma import Arma
 
 class Giocatore:
-    def __init__(self, ruolo: str, sceriffo: bool, posizione: int, pf: int, id: int, equipaggiamento: list, abilità: str):
+    def __init__(self, ruolo: str, sceriffo: bool, posizione: int, pf: int, id: int, equipaggiamento: Arma, abilità: str):
         self._ruolo = ruolo
         self._sceriffo = sceriffo
         self._posizione = posizione
@@ -17,19 +18,6 @@ class Giocatore:
         carta_pescata = mazzo.pesca_carte()
         if carta_pescata:
             self._mano.aggiungi_carta(carta_pescata)
-
-    def carta_bang(self):
-        if self.gioca_carte()._nome == "BANG!":
-            bang_giocato = True
-        if self.gioca_carte()._nome == "BANG!" and bang_giocato:
-            print("Hai già giocato un BANG! questo turno, cambia carta\n")
-
-    def equipaggiamento(self):
-        if self.gioca_carte()._equipaggiabile:
-            self._equipaggiamento = self.gioca_carte()
-            arma = True
-        if self.gioca_carte()._equipaggiabile and arma:
-            arma_attuale = self.gioca_carte()
 
     def gioca_carte(self) -> Carta:
         print("Queste sono le carte che hai in mano: \n")

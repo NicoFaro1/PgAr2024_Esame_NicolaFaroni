@@ -110,14 +110,49 @@ class Partita:
             for i in range(3):
                 Giocatore.pesca_carte(attaccante, self._mazzo)
 
+    def carta_bang(self, giocatore: Giocatore, attaccante: Giocatore):
+        colpo_a_segno = False
+        if giocatore.gioca_carte()._nome == "BANG!":
+            bang_giocato = True
+            self.visualizza_distanza(giocatore, attaccante)
+            distanza = self.calcola_distanza(giocatore, attaccante)
+            if not giocatore._equipaggiamento and distanza == 1:
+                colpo_a_segno = True
+                self.gestione_mancato(giocatore)
+            if giocatore._equipaggiamento and distanza <= giocatore._equipaggiamento._distanza:
+                colpo_a_segno = True
+                self.gestione_mancato(giocatore)
+        if giocatore.gioca_carte()._nome == "BANG!" and bang_giocato:
+            print("Hai già giocato un BANG! questo turno, cambia carta\n")
+            Giocatore.gioca_carte(giocatore)
+
+    def gestione_mancato(self, giocatore: Giocatore):
+        if "Mancato!" in giocatore._mano:
+            risposta = input("Vuoi usare la carta Mancato! ?\n")
+            if risposta == "si":
+                giocatore._mano._carte.pop("Mancato!")
+                print("Hai schivato l'attacco")
+            else:
+                giocatore._pf -= 1
+                print("Hai subito un colpo, i tuoi punti ferita sono scesi")
+        else:
+            print("Non hai la carta Mancato! in mano")
+
+    def equipaggiamento(giocatore: Giocatore):
+        if giocatore.gioca_carte()._equipaggiabile:
+            giocatore._equipaggiamento = giocatore.gioca_carte()
+            arma = True
+        if giocatore.gioca_carte()._equipaggiabile and arma:
+            giocatore._equipaggiamento = giocatore.gioca_carte()
+
     def turno_giocatore(self, giocatore: Giocatore):
         print(f"È il turno del giocatore {giocatore._id} ({giocatore._ruolo})")
         for i in range(2):
             Giocatore.pesca_carte(giocatore, self._mazzo)
         while len(giocatore._mano) >= 0: 
             Giocatore.gioca_carte(giocatore)
-            Giocatore.carta_bang()
-            Giocatore.equipaggiamento()
+            self.carta_bang()
+            self.equipaggiamento()
         else:
             print("Hai finito le carte in mano\n")
         self.scarta_carte(giocatore)
