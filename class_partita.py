@@ -18,8 +18,15 @@ class Partita:
         while num_giocatori < 4 or num_giocatori > 7:
             num_giocatori = int(input("Hai sbagliato ad inserire il numero di giocatori, riprova (4-7)"))
         ruoli = self.assegna_ruoli(num_giocatori)
-        self._lista_giocatori = [Giocatore(ruoli[i], ruoli[i] == 'Sceriffo', i) for i in range(num_giocatori)]
+        self._lista_giocatori = [Giocatore(ruoli[i], ruoli[i] == 'Sceriffo', i, 4) for i in range(num_giocatori)]
         random.shuffle(self._lista_giocatori[1:])
+
+    def aggiungi_pf(self):
+        for giocatore in self._lista_giocatori:
+            if giocatore._ruolo == "Sceriffo":
+                giocatore._pf = 5
+            else:
+                giocatore._pf = 4
 
     def assegna_ruoli(self, num_giocatori: int):
         ruoli = ["Sceriffo", "Rinnegato"] + ["Fuorilegge"]*2
@@ -63,6 +70,7 @@ class Partita:
                 print("La carta selezionata non è nella tua mano, Riprova\n")
 
     def verifica_condizioni_fine_partita(self, giocatore_eliminato: Giocatore):
+        self._fine_partita = False
         if giocatore_eliminato._ruolo == "Sceriffo":
             rinnegato_in_gioco = False
             altri_giocatori_vivi = False
@@ -73,8 +81,10 @@ class Partita:
                     altri_giocatori_vivi = True
             if altri_giocatori_vivi and not rinnegato_in_gioco:
                 print("I fuorilegge hanno vinto!")
+                self._fine_partita = True
             if not altri_giocatori_vivi and rinnegato_in_gioco:
                 print("Il rinnegato ha vinto!")
+                self._fine_partita = True
         if giocatore_eliminato._ruolo == "Fuorilegge" or giocatore_eliminato._ruolo == "Rinnegato":
             rinnegato_vivo = False
             fuorilegge_vivi = False
@@ -87,6 +97,7 @@ class Partita:
                 for giocatori in self._lista_giocatori:
                     if giocatori._ruolo == "Sceriffo" or giocatori._ruolo == "Vice":
                         print("Lo sceriffo e i suoi Vice hanno vinto!")
+                        self._fine_partita = True
 
     def elimina_giocatore(self, giocatore_colpito: Giocatore, attaccante: Giocatore):
         if giocatore_colpito._pf <= 0:
@@ -95,6 +106,31 @@ class Partita:
                 giocatore_colpito._mano.remove(carta)
                 self._pila_scarti.append(carta)
             self.verifica_condizioni_fine_partita(giocatore_colpito)
-        
-        
+            self._lista_giocatori.remove(giocatore_colpito)
+        if attaccante._ruolo == "Sceriffo" and giocatore_colpito._pf <= 0 and giocatore_colpito._ruolo == "Vice":
+            for i in attaccante._mano._carte:
+                Mano.rimuovi_carta(i, self._pila_scarti)
+            ## scarta equipaggiamento
+
+        if giocatore_colpito._ruolo == "Fuorilegge" and giocatore_colpito._pf <= 0:
+            for i in range(3):
+                Giocatore.pesca_carte(attaccante, self._mazzo)
+
+    def turno_giocatore(self, giocatore: Giocatore):
+        print(f"È il turno del giocatore {giocatore._id} ({giocatore._ruolo})")
+        for i in range(2):
+            Giocatore.pesca_carte(giocatore, self._mazzo)
+        while len(giocatore._mano) >= 0: 
+            Giocatore.gioca_carte(giocatore, self._mazzo)
+        else:
+            print("Hai finito le carte in mano\n")
+        self.scarta_carte(giocatore)
+        print("Fine del turno")    
+
+    def inizia_partita(self):
+        while not self._fine_partita:
+            giocatore_corrente = self._lista_giocatori[self._turno % len(self._lista_giocatori)]    
+            self.turno_giocatore(giocatore_corrente)
+            self._turno += 1
+
 
