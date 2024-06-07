@@ -1,5 +1,4 @@
 from class_carta import Carta
-from class_partita import Partita
 
 class Mano:
     def __init__(self, numero: int, carta: Carta):
@@ -14,7 +13,9 @@ class Mano:
         for numero, carta in self._carte.items():
             print(f"{numero}: {carta._nome}\n")
 
-    def rimuovi_carta(self, numero: int, partita: Partita):
+    def rimuovi_carta(self, numero: int, lista: list):
         carta_rimossa = self._carte.pop(numero)
-        partita._lista_giocatori.append(carta_rimossa)
+        lista.append(carta_rimossa)
+    
+    
         

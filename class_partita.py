@@ -1,5 +1,6 @@
 from class_mazzo import Mazzo
 from class_giocatore import Giocatore
+from class_mano import Mano
 import random
 
 class Partita:
@@ -51,6 +52,16 @@ class Partita:
             distanza = self.calcola_distanza(giocatore1, giocatore2)
             print(f"Il giocatore {giocatore1._id} è a distanza {distanza} da {giocatore2._id}")
 
+    def scarta_carte(self, giocatore: Giocatore):
+        while len(Mano._carte) > giocatore._pf:
+            print(f"{Mano._carte}\n")
+            print(f"Devi scartare {len(Mano._carte)-giocatore._pf}\n") 
+            carta_da_scartare = input("Seleziona la carta che vuoi scartare: \n")
+            if carta_da_scartare in Mano._carte:
+                Mano.rimuovi_carta(Mano, carta_da_scartare, self._pila_scarti)
+            else:
+                print("La carta selezionata non è nella tua mano, Riprova\n")
+
     def verifica_condizioni_fine_partita(self, giocatore_eliminato: Giocatore):
         if giocatore_eliminato._ruolo == "Sceriffo":
             rinnegato_in_gioco = False
@@ -77,11 +88,13 @@ class Partita:
                     if giocatori._ruolo == "Sceriffo" or giocatori._ruolo == "Vice":
                         print("Lo sceriffo e i suoi Vice hanno vinto!")
 
-    def elimina_giocatore(self, giocatore: Giocatore):
-        if giocatore._pf <= 0:
-            print(f"Il giocatore eliminato aveva il ruolo di {giocatore._ruolo}")
-            for carta in len(giocatore._mano):
-                giocatore._mano.remove(carta)
+    def elimina_giocatore(self, giocatore_colpito: Giocatore, attaccante: Giocatore):
+        if giocatore_colpito._pf <= 0:
+            print(f"Il giocatore eliminato aveva il ruolo di {giocatore_colpito._ruolo}")
+            for carta in len(giocatore_colpito._mano):
+                giocatore_colpito._mano.remove(carta)
                 self._pila_scarti.append(carta)
-            self.verifica_condizioni_fine_partita(giocatore)
+            self.verifica_condizioni_fine_partita(giocatore_colpito)
+        
+        
 
