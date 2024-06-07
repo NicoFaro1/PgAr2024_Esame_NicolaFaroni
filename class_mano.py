@@ -13,9 +13,10 @@ class Mano:
         for numero, carta in self._carte.items():
             print(f"{numero}: {carta._nome}\n")
 
-    def rimuovi_carta(self, numero: int, lista: list):
+    def rimuovi_carta(self, numero: int, lista: list) -> Carta:
         carta_rimossa = self._carte.pop(numero)
         lista.append(carta_rimossa)
+        return carta_rimossa
     
     
         

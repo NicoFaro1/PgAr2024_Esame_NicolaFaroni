@@ -12,7 +12,7 @@ class Partita:
         self._pila_scarti = pila_scarti
         self._fine_partita = fine_partita
 
-    def aggiungi_giocatori(self, num_giocatori):
+    def aggiungi_giocatori(self, num_giocatori: int):
         ruoli = self.assegna_ruoli(num_giocatori)
         self._lista_giocatori = [Giocatore(ruoli[i], ruoli[i] == 'Sceriffo', i, 4) for i in range(num_giocatori)]
         random.shuffle(self._lista_giocatori[1:])
@@ -51,7 +51,6 @@ class Partita:
         if giocatore1._posizione == giocatore2._posizione:
             print(f"Il giocatore {giocatore1._id} è a distanza 0 da {giocatore2._id}")
         else:
-            # Calcola la distanza utilizzando una funzione della classe Partita
             distanza = self.calcola_distanza(giocatore1, giocatore2)
             print(f"Il giocatore {giocatore1._id} è a distanza {distanza} da {giocatore2._id}")
 
@@ -116,16 +115,27 @@ class Partita:
         for i in range(2):
             Giocatore.pesca_carte(giocatore, self._mazzo)
         while len(giocatore._mano) >= 0: 
-            Giocatore.gioca_carte(giocatore, self._mazzo)
+            Giocatore.gioca_carte(giocatore)
+            Giocatore.carta_bang()
+            Giocatore.equipaggiamento()
         else:
             print("Hai finito le carte in mano\n")
         self.scarta_carte(giocatore)
+        Giocatore.visualizza_pf(giocatore)
         print("Fine del turno")    
 
     def inizia_partita(self):
         while not self._fine_partita:
+            self._turno = 0
             giocatore_corrente = self._lista_giocatori[self._turno % len(self._lista_giocatori)]    
             self.turno_giocatore(giocatore_corrente)
             self._turno += 1
+
+    def verifica_num_giocatori(self) -> int:
+        num_giocatori = 0
+        num_giocatori = int(input("Inserisci il numero di giocatori: "))
+        while num_giocatori < 4 or num_giocatori > 7:
+            num_giocatori = int(input("Hai sbagliato ad inserire il numero di giocatori, riprova (4-7)"))
+        return num_giocatori
 
 
