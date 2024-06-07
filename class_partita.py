@@ -2,6 +2,7 @@ from class_mazzo import Mazzo
 from class_giocatore import Giocatore
 from class_mano import Mano
 import random
+import json
 
 class Partita:
     def __init__(self, num_giocatori: int, lista_giocatori: list, turno: int, pila_scarti: list, fine_partita: bool, tipo_partita: int):
@@ -271,5 +272,12 @@ class Partita:
         while num_giocatori < 4 or num_giocatori > 7:
             num_giocatori = int(input("Hai sbagliato ad inserire il numero di giocatori, riprova (4-7)"))
         return num_giocatori
+    
+    def scrivi_classifica(self):
+        percorso_file = "classifica_finale.json"
+        with open(percorso_file, "w") as file:
+            json.dump(self._lista_giocatori, file, indent=4)
+
+
 
 
